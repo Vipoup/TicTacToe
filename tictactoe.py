@@ -7,7 +7,7 @@
 def makeBoard():
     cols = 3;
     rows = 3;
-    board = [["o"]*cols]*rows;
+    board = [[" "]*cols]*rows;
     return board;
 
 #given a board (2D array), print board in a nice format 
@@ -28,14 +28,14 @@ def printBoard(board):
 # calculate next move
 
 #AI moves
-def moveAI(board):
+def moveAI(board, storeMovesAI):
 
     printBoard(board);
     print("AI moved ", "here", "\n");
     return board, [];
 
 #Player moves
-def movePlayer(board):
+def movePlayer(board, storeMovesPlayer):
 
     printBoard(board);
     print();
@@ -59,6 +59,7 @@ if __name__ == "__main__":
     #Ask user for board size, hardcoded for now for 3x3
     board = makeBoard();
     printBoard(board);
+    print();
 
     storeMovesAI = [];
     storeMovesPlayer = [];
