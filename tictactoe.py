@@ -42,8 +42,17 @@ def movePlayer(board, storeMovesPlayer):
     return board, [];
 
 #Check if board is full
-def isBoardFull():
-    return;
+# if board is full, return true. 
+# if board finds an empty space, return false 
+def isBoardFull(board):
+    rows = len(board);
+    columns = len(board[0]);
+
+    for row in range(rows):
+        for col in range(columns):
+            if board[row][col] == " ":
+                return False;
+    return True;
 
 #check if a given array has a win
 def checkWin():
@@ -70,6 +79,11 @@ if __name__ == "__main__":
     #if win=true, break loop (unless we're doing the 5 in a row version)
     board, storeMovesPlayer = movePlayer(board, storeMovesPlayer);
     #win = checkWin(storeMovesPlayer)
+    #if win=true, break loop (unless we're doing the 5 in a row version)
+
+    # testing -----------------------
+    # print(isBoardFull(board));
+    # -------------------------------
 
     #out of loop, announce who wins 
     # ask player if they want to play again; yes continue, no break
