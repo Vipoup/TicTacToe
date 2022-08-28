@@ -7,7 +7,7 @@
 def makeBoard():
     cols = 3;
     rows = 3;
-    board = [[" "]*cols]*rows;
+    board = [[" " for i in range(cols)] for j in range(rows)]
     return board;
 
 #given a board (2D array), print board in a nice format 
@@ -28,18 +28,33 @@ def printBoard(board):
 # calculate next move
 
 #AI moves
-def moveAI(board, storeMovesAI):
+def moveAI(board, storeMovesAI, storeMovesPlayer):
 
     printBoard(board);
     print("AI moved ", "here", "\n");
-    return board, [];
+    return board, storeMovesAI;
 
 #Player moves
 def movePlayer(board, storeMovesPlayer):
 
+    # when doing the input quality check, 
+    # include the avaliable range to be within the board dim
+    # ontop of some regex to see if the input is num,num
+    move = input("Enter coordinates to place 'o' " + 
+    "(row,coulmn e.g. 1,0 for the top left spot): ");
+
+    coords = move.split(",");
+
+    coords[0] = int(coords[0]);
+    coords[1] = int(coords[1]);
+
+    storeMovesPlayer.append(coords);
+
+    board[coords[0]][coords[1]] = "o";
+
     printBoard(board);
     print();
-    return board, [];
+    return board, storeMovesPlayer;
 
 #Check if board is full
 # if board is full, return true. 
@@ -74,7 +89,7 @@ if __name__ == "__main__":
     storeMovesPlayer = [];
 
     #while board is not empty or player chooses to end game
-    board, storeMovesAI = moveAI(board, storeMovesAI);
+    board, storeMovesAI = moveAI(board, storeMovesAI, storeMovesPlayer);
     #win = checkWin(storeMovesAI)
     #if win=true, break loop (unless we're doing the 5 in a row version)
     board, storeMovesPlayer = movePlayer(board, storeMovesPlayer);
