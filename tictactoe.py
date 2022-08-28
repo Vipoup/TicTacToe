@@ -2,6 +2,7 @@
 # Ken Nguyen
 # CSCI 4307
 # AI TicTacToe
+import re;
 
 #create board based on given dimensions, return board
 def makeBoard():
@@ -36,14 +37,24 @@ def moveAI(board, storeMovesAI, storeMovesPlayer):
 
 #Player moves
 def movePlayer(board, storeMovesPlayer):
+    rows = len(board);
+    columns = len(board[0]);
+    check = True;
+    coords = [];
 
-    # when doing the input quality check, 
-    # include the avaliable range to be within the board dim
-    # ontop of some regex to see if the input is num,num
-    move = input("Enter coordinates to place 'o' " + 
-    "(row,coulmn e.g. 1,0 for the top left spot): ");
+    while check:
+        move = input("Enter coordinates to place 'o' " + 
+        "(row,coulmn e.g. 1,0 for the top left spot): ");
 
-    coords = move.split(",");
+        if re.search("^[0-9]*,[0-9]*$", move):
+            coords = move.split(",");
+            if int(coords[0]) > rows or int(coords[1]) > columns:
+                print("The input was not the board range. Please try again.");
+            else:
+                check = False;
+        else:
+            print("The input was not in the right format. Please try again.");
+        
 
     coords[0] = int(coords[0]);
     coords[1] = int(coords[1]);
