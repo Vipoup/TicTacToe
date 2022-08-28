@@ -48,10 +48,13 @@ def movePlayer(board, storeMovesPlayer):
 
         if re.search("^[0-9]*,[0-9]*$", move):
             coords = move.split(",");
-            if int(coords[0]) > rows or int(coords[1]) > columns:
+            if int(coords[0]) > rows-1 or int(coords[1]) > columns-1:
                 print("The input was not the board range. Please try again.");
             else:
-                check = False;
+                if board[int(coords[0])][int(coords[1])] == " ":
+                    check = False;
+                else:
+                    print("This spot is not empty. Please try again.");
         else:
             print("The input was not in the right format. Please try again.");
         
@@ -95,21 +98,19 @@ if __name__ == "__main__":
     board = makeBoard();
     printBoard(board);
     print();
+    #while board is not empty or player chooses to end game; focus on full board for now
+    while not isBoardFull(board):
+        storeMovesAI = [];
+        storeMovesPlayer = [];
 
-    storeMovesAI = [];
-    storeMovesPlayer = [];
+        board, storeMovesAI = moveAI(board, storeMovesAI, storeMovesPlayer);
+        #win = checkWin(storeMovesAI)
+        #if win=true, break loop (unless we're doing the 5 in a row version)
+        board, storeMovesPlayer = movePlayer(board, storeMovesPlayer);
+        #win = checkWin(storeMovesPlayer)
+        #if win=true, break loop (unless we're doing the 5 in a row version)
 
-    #while board is not empty or player chooses to end game
-    board, storeMovesAI = moveAI(board, storeMovesAI, storeMovesPlayer);
-    #win = checkWin(storeMovesAI)
-    #if win=true, break loop (unless we're doing the 5 in a row version)
-    board, storeMovesPlayer = movePlayer(board, storeMovesPlayer);
-    #win = checkWin(storeMovesPlayer)
-    #if win=true, break loop (unless we're doing the 5 in a row version)
-
-    # testing -----------------------
-    # print(isBoardFull(board));
-    # -------------------------------
+        
 
     #out of loop, announce who wins 
     # ask player if they want to play again; yes continue, no break
