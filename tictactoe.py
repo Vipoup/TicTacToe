@@ -36,15 +36,20 @@ def moveAI(board, storeMovesAI, storeMovesPlayer):
     return board, storeMovesAI;
 
 #Player moves
-def movePlayer(board, storeMovesPlayer):
+def movePlayer(board, storeMovesPlayer, exitGame):
     rows = len(board);
     columns = len(board[0]);
     check = True;
     coords = [];
 
     while check:
+        print("If you would like to exit game, enter 'exit'.");
         move = input("Enter coordinates to place 'o' " + 
         "(row,coulmn e.g. 1,0 for the top left spot): ");
+
+        if re.search("[Ee]xit", move):
+            exitGame = True;
+            return board, storeMovesPlayer, exitGame;
 
         if re.search("^[0-9]*,[0-9]*$", move):
             coords = move.split(",");
@@ -68,7 +73,7 @@ def movePlayer(board, storeMovesPlayer):
 
     printBoard(board);
     print();
-    return board, storeMovesPlayer;
+    return board, storeMovesPlayer, exitGame;
 
 #Check if board is full
 # if board is full, return true. 
@@ -84,10 +89,14 @@ def isBoardFull(board):
     return True;
 
 #check if a given array has a win
-def checkWin():
+def checkWin(storeMoves):
     #check win by looking at all the moves (stored as an array of an array of moves e.g. [[1,1],[0,0],[2,2]])
     #if they do win, return something to break the loop
-    return;
+    for move in storeMoves:
+        if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves:
+            print("WIN");
+            return True;
+    return False;
 
 #main
 if __name__ == "__main__":
@@ -95,19 +104,23 @@ if __name__ == "__main__":
     #ask play vs AI, or pvp, or AIvAI; focus on PvsAI for now
     #could ask for who goes first; AI goes first for now
     #Ask user for board size, hardcoded for now for 3x3
+    
     board = makeBoard();
     printBoard(board);
     print();
-    #while board is not empty or player chooses to end game; focus on full board for now
-    while not isBoardFull(board):
-        storeMovesAI = [];
-        storeMovesPlayer = [];
+    exitGame = False;
+    win = False;
+    storeMovesAI = [];
+    storeMovesPlayer = [];
 
-        board, storeMovesAI = moveAI(board, storeMovesAI, storeMovesPlayer);
+    #while board is not empty or player chooses to end game; focus on full board for now
+    while not isBoardFull(board) and not exitGame and not win:
+
+        # board, storeMovesAI = moveAI(board, storeMovesAI, storeMovesPlayer);
         #win = checkWin(storeMovesAI)
         #if win=true, break loop (unless we're doing the 5 in a row version)
-        board, storeMovesPlayer = movePlayer(board, storeMovesPlayer);
-        #win = checkWin(storeMovesPlayer)
+        board, storeMovesPlayer, exitGame = movePlayer(board, storeMovesPlayer, exitGame);
+        win = checkWin(storeMovesPlayer);
         #if win=true, break loop (unless we're doing the 5 in a row version)
 
         
