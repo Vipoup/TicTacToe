@@ -3,6 +3,7 @@
 # CSCI 4307
 # AI TicTacToe
 import re;
+import copy;
 
 #create board based on given dimensions, return board
 def makeBoard():
@@ -28,14 +29,70 @@ def printBoard(board):
         if(row != rows-1):
             print("--"*columns);
 
-# calculate next move
+# checkNextMove
+def checkNextMove(space, storeMoves):
+    tempStoreMoves = copy.deepcopy(storeMoves);
+    tempStoreMoves.append(space);
+    if checkWin(tempStoreMoves):
+        return 1;
+    return 0;
+
+def move(board, coords, storeMoves, letter):
+    storeMoves.append(coords); # add coords to array
+
+    board[coords[0]][coords[1]] = letter; # place on board
+    return board, storeMoves;
 
 #AI moves
 def moveAI(board, storeMovesAI, storeMovesPlayer):
 
+    emptySpaces = findEmptySpaces(board);
+    winningMove = [];
+    losingMove = [];
+    neutralMove = [];
+
+    for space in emptySpaces:
+        checkNextAI = checkNextMove(space, storeMovesAI);
+        checkNextPlayer = checkNextMove(space, storeMovesPlayer);
+        if checkNextAI == 1:
+            winningMove.append(space);
+        elif checkNextPlayer == 1:
+            losingMove.append(space);
+        elif checkNextAI == 0 or checkNextPlayer == 0:
+            neutralMove.append(space);
+            #probably need to optimize for if there is a next "best move"
+    
+    if len(winningMove) != 0:
+        board, storeMovesAI = move(board, winningMove.pop(-1), storeMovesAI, "x");
+    elif len(losingMove) != 0:
+        board, storeMovesAI = move(board, losingMove.pop(-1), storeMovesAI, "x");
+    elif len(neutralMove) != 0:
+        board, storeMovesAI = move(board, neutralMove.pop(-1), storeMovesAI, "x");
+        #once again, need to optimize somehow
+
     printBoard(board);
-    print("AI moved ", "here", "\n");
-    return board, storeMovesAI;
+    movedAI = str(storeMovesAI[len(storeMovesAI)-1]);
+    print("AI moved "+ movedAI + ".\n");
+
+    win = checkWin(storeMovesAI);
+    if win:
+        print("Computer has won.");
+
+    return board, storeMovesAI, win;
+
+def findEmptySpaces(board):
+    rows = len(board);
+    columns = len(board[0]);
+    emptySpaces = [];
+    coords = [];
+
+    # check if there are any empty spots
+    for row in range(rows):
+        for col in range(columns):
+            if board[row][col] == " ":
+                coords = [row, col];
+                emptySpaces.append(coords);
+    return emptySpaces;
 
 #Player moves
 def movePlayer(board, storeMovesPlayer, exitGame):
@@ -74,6 +131,7 @@ def movePlayer(board, storeMovesPlayer, exitGame):
     coords[0] = int(coords[0]);
     coords[1] = int(coords[1]);
 
+    # board, storeMovesPlayer = move(board, coords, storeMovesPlayer, "o"); # crashes for some reason
     storeMovesPlayer.append(coords); # add coords to array
 
     board[coords[0]][coords[1]] = "o"; # place on board
@@ -142,13 +200,15 @@ if __name__ == "__main__":
     #while board is not empty or player chooses to end game; focus on full board for now
     while not isBoardFull(board) and not exitGame and not win:
 
-        # board, storeMovesAI = moveAI(board, storeMovesAI, storeMovesPlayer);
+        board, storeMovesAI, win = moveAI(board, storeMovesAI, storeMovesPlayer);
         #if win=true, break loop (unless we're doing the 5 in a row version)
-
+        if win or isBoardFull(board):
+            break;
         board, storeMovesPlayer, exitGame, win = movePlayer(board, storeMovesPlayer, exitGame);
         #if win=true, break loop (unless we're doing the 5 in a row version)
 
-        
+    if win == False:
+        print("Draw.");
 
     #out of loop
     # ask player if they want to play again; yes continue, no break
