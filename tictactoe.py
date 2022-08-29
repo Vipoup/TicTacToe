@@ -49,19 +49,19 @@ def movePlayer(board, storeMovesPlayer, exitGame):
 
         if re.search("[Ee]xit", move):
             exitGame = True;
-            return board, storeMovesPlayer, exitGame;
+            return board, storeMovesPlayer, exitGame, False;
 
         if re.search("^[0-9]*,[0-9]*$", move):
             coords = move.split(",");
             if int(coords[0]) > rows-1 or int(coords[1]) > columns-1:
-                print("The input was not the board range. Please try again.");
+                print("The input was not the board range. Please try again.\n");
             else:
                 if board[int(coords[0])][int(coords[1])] == " ":
                     check = False;
                 else:
-                    print("This spot is not empty. Please try again.");
+                    print("This spot is not empty. Please try again.\n");
         else:
-            print("The input was not in the right format. Please try again.");
+            print("The input was not in the right format. Please try again.\n");
         
 
     coords[0] = int(coords[0]);
@@ -73,7 +73,12 @@ def movePlayer(board, storeMovesPlayer, exitGame):
 
     printBoard(board);
     print();
-    return board, storeMovesPlayer, exitGame;
+
+    win = checkWin(storeMovesPlayer);
+    if win:
+        print("Player has won!");
+
+    return board, storeMovesPlayer, exitGame, win;
 
 #Check if board is full
 # if board is full, return true. 
@@ -96,19 +101,15 @@ def checkWin(storeMoves):
     for move in storeMoves:
         if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves:
             # left to right diagnal
-            print("WIN");
             return True;
         elif [move[0]-1, move[1]] in storeMoves and [move[0]+1, move[1]] in storeMoves:
             # up and down; vertical
-            print("WIN");
             return True;
         elif [move[0], move[1]-1] in storeMoves and [move[0], move[1]+1] in storeMoves:
             # left and right; horizontal
-            print("WIN");
             return True;
         elif [move[0]-1, move[1]+1] in storeMoves and [move[0]+1, move[1]-1] in storeMoves:
             # right to left diagnal 
-            print("WIN");
             return True;
     return False;
 
@@ -131,17 +132,12 @@ if __name__ == "__main__":
     while not isBoardFull(board) and not exitGame and not win:
 
         # board, storeMovesAI = moveAI(board, storeMovesAI, storeMovesPlayer);
-        #win = checkWin(storeMovesAI)
         #if win=true, break loop (unless we're doing the 5 in a row version)
-        board, storeMovesPlayer, exitGame = movePlayer(board, storeMovesPlayer, exitGame);
-        win = checkWin(storeMovesPlayer);
+
+        board, storeMovesPlayer, exitGame, win = movePlayer(board, storeMovesPlayer, exitGame);
         #if win=true, break loop (unless we're doing the 5 in a row version)
 
         
 
-    #out of loop, announce who wins 
+    #out of loop
     # ask player if they want to play again; yes continue, no break
-
-
-
-# ideas: push each move onto an array so its easier to keep track of if a win has been met
