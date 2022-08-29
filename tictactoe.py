@@ -6,8 +6,10 @@ import re;
 
 #create board based on given dimensions, return board
 def makeBoard():
+    # will get user input on this later
     cols = 3;
     rows = 3;
+    #make a blank 2D board based on given rows,columns
     board = [[" " for i in range(cols)] for j in range(rows)]
     return board;
 
@@ -42,20 +44,25 @@ def movePlayer(board, storeMovesPlayer, exitGame):
     check = True;
     coords = [];
 
+    #quality checking input
     while check:
         print("If you would like to exit game, enter 'exit'.");
         move = input("Enter coordinates to place 'o' " + 
         "(row,coulmn e.g. 1,0 for the top left spot): ");
 
+        # if user wants to exit
         if re.search("[Ee]xit", move):
             exitGame = True;
             return board, storeMovesPlayer, exitGame, False;
 
+        # if input is in num,num format
         if re.search("^[0-9]*,[0-9]*$", move):
             coords = move.split(",");
+            # if input is not in the board range
             if int(coords[0]) > rows-1 or int(coords[1]) > columns-1:
                 print("The input was not the board range. Please try again.\n");
             else:
+                # if spot is not taken
                 if board[int(coords[0])][int(coords[1])] == " ":
                     check = False;
                 else:
@@ -63,13 +70,13 @@ def movePlayer(board, storeMovesPlayer, exitGame):
         else:
             print("The input was not in the right format. Please try again.\n");
         
-
+    # convert str to int
     coords[0] = int(coords[0]);
     coords[1] = int(coords[1]);
 
-    storeMovesPlayer.append(coords);
+    storeMovesPlayer.append(coords); # add coords to array
 
-    board[coords[0]][coords[1]] = "o";
+    board[coords[0]][coords[1]] = "o"; # place on board
 
     printBoard(board);
     print();
@@ -87,6 +94,7 @@ def isBoardFull(board):
     rows = len(board);
     columns = len(board[0]);
 
+    # check if there are any empty spots
     for row in range(rows):
         for col in range(columns):
             if board[row][col] == " ":
@@ -118,6 +126,9 @@ if __name__ == "__main__":
     #eventually, while true(or until user ends)
     #ask play vs AI, or pvp, or AIvAI; focus on PvsAI for now
     #could ask for who goes first; AI goes first for now
+    #   could make class for AI/Player, have a func called move,
+    #   then be able to make it more dynamic for if they want
+    #   pvp, aivai, pvai, and who goes first. Do later
     #Ask user for board size, hardcoded for now for 3x3
 
     board = makeBoard();
