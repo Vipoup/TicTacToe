@@ -90,10 +90,24 @@ def isBoardFull(board):
 
 #check if a given array has a win
 def checkWin(storeMoves):
-    #check win by looking at all the moves (stored as an array of an array of moves e.g. [[1,1],[0,0],[2,2]])
+    #check win by looking at all the moves 
+    # (stored as an array of an array of moves e.g. [[1,1],[0,0],[2,2]])
     #if they do win, return something to break the loop
     for move in storeMoves:
         if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves:
+            # left to right diagnal
+            print("WIN");
+            return True;
+        elif [move[0]-1, move[1]] in storeMoves and [move[0]+1, move[1]] in storeMoves:
+            # up and down; vertical
+            print("WIN");
+            return True;
+        elif [move[0], move[1]-1] in storeMoves and [move[0], move[1]+1] in storeMoves:
+            # left and right; horizontal
+            print("WIN");
+            return True;
+        elif [move[0]-1, move[1]+1] in storeMoves and [move[0]+1, move[1]-1] in storeMoves:
+            # right to left diagnal 
             print("WIN");
             return True;
     return False;
@@ -104,7 +118,7 @@ if __name__ == "__main__":
     #ask play vs AI, or pvp, or AIvAI; focus on PvsAI for now
     #could ask for who goes first; AI goes first for now
     #Ask user for board size, hardcoded for now for 3x3
-    
+
     board = makeBoard();
     printBoard(board);
     print();
