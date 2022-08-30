@@ -84,7 +84,13 @@ def moveAI(board, storeMovesAI, storeMovesPlayer, letter):
         board, storeMovesAI = move(board, neutralMove.pop(len(neutralMove)//2), storeMovesAI, letter);
 
     printBoard(board);
-    movedAI = str(storeMovesAI[len(storeMovesAI)-1]);
+    # make AI output easier to understand for humans
+    # take the last move AI made
+    lastMoved = storeMovesAI[len(storeMovesAI)-1];
+    # add 1 for readability
+    output = [lastMoved[0]+1, lastMoved[1]+1];
+    #turn to str to concat
+    movedAI = str(output);
     print("AI moved "+ movedAI + ".\n");
 
     win = checkWin(storeMovesAI);
@@ -118,22 +124,23 @@ def movePlayer(board, storeMovesPlayer, exitGame, letter):
     while check:
         print("If you would like to exit game, enter 'exit'.");
         move = input("Enter coordinates to place '" + letter +
-        "' (row,coulmn e.g. 0,0 for the top left spot): ");
+        "' (row,coulmn e.g. 1,1 for the top left spot): ");
 
         # if user wants to exit
         if re.search("[Ee]xit", move):
             exitGame = True;
-            return board, storeMovesPlayer, exitGame, False;
+            return board, storeMovesPlayer, False, exitGame;
 
         # if input is in num,num format
         if re.search("^[0-9]*,[0-9]*$", move):
             coords = move.split(",");
             # if input is not in the board range
-            if int(coords[0]) > rows-1 or int(coords[1]) > columns-1:
+            if int(coords[0]) > rows or int(coords[1]) > columns \
+            or int(coords[0]) == 0 or int(coords[1]) == 0:
                 print("The input was not the board range. Please try again.\n");
             else:
                 # if spot is not taken
-                if board[int(coords[0])][int(coords[1])] == " ":
+                if board[int(coords[0])-1][int(coords[1])-1] == " ":
                     check = False;
                 else:
                     print("This spot is not empty. Please try again.\n");
@@ -143,6 +150,10 @@ def movePlayer(board, storeMovesPlayer, exitGame, letter):
     # convert str to int
     coords[0] = int(coords[0]);
     coords[1] = int(coords[1]);
+
+    # convert human readable text to array standard
+    coords[0] = coords[0]-1;
+    coords[1] = coords[1]-1;
 
     # board, storeMovesPlayer = move(board, coords, storeMovesPlayer, "o"); # crashes for some reason
     storeMovesPlayer.append(coords); # add coords to array
@@ -222,7 +233,7 @@ if __name__ == "__main__":
         #if win=true, break loop (unless we're doing the 5 in a row version)
         # board, storeMovesPlayer, win = moveAI(board, storeMovesPlayer, storeMovesAI, "o");
 
-    if win == False:
+    if win == False and not exitGame:
         print("Draw.");
 
     #out of loop
