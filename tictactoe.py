@@ -68,9 +68,31 @@ def moveAI(board, storeMovesAI, storeMovesPlayer, letter):
     elif len(neutralMove) != 0 and len(storeMovesAI) != 0:
         prevMove = storeMovesAI.pop(-1);
         storeMovesAI.append(prevMove);
-
-        #corners are more powerful
-        if [prevMove[0]-1, prevMove[1]-1] in neutralMove:
+        #if diagnal placement
+        if [prevMove[0]-1, prevMove[1]-1] in storeMovesPlayer \
+        and [prevMove[0]+1, prevMove[1]+1] in storeMovesPlayer:
+            #move in cardinal direction
+            if [prevMove[0]-1, prevMove[1]] in neutralMove:
+                board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]], storeMovesAI, letter);
+            elif [prevMove[0]+1, prevMove[1]] in neutralMove:
+                board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]], storeMovesAI, letter);
+            elif [prevMove[0], prevMove[1]-1] in neutralMove:
+                board, storeMovesAI = move(board, [prevMove[0], prevMove[1]-1], storeMovesAI, letter);
+            elif [prevMove[0], prevMove[1]+1] in neutralMove:
+                board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]+1], storeMovesAI, letter);
+        elif [prevMove[0]-1, prevMove[1]+1] in storeMovesPlayer \
+        and [prevMove[0]+1, prevMove[1]-1] in storeMovesPlayer:
+            #move in cardinal direction
+            if [prevMove[0]-1, prevMove[1]] in neutralMove:
+                board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]], storeMovesAI, letter);
+            elif [prevMove[0]+1, prevMove[1]] in neutralMove:
+                board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]], storeMovesAI, letter);
+            elif [prevMove[0], prevMove[1]-1] in neutralMove:
+                board, storeMovesAI = move(board, [prevMove[0], prevMove[1]-1], storeMovesAI, letter);
+            elif [prevMove[0], prevMove[1]+1] in neutralMove:
+                board, storeMovesAI = move(board, [prevMove[0], prevMove[1]+1], storeMovesAI, letter);
+        #corners are more powerful otherwise
+        elif [prevMove[0]-1, prevMove[1]-1] in neutralMove:
             board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]-1], storeMovesAI, letter);
         elif [prevMove[0]-1, prevMove[1]+1] in neutralMove:
             board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]+1], storeMovesAI, letter);
@@ -239,9 +261,9 @@ if __name__ == "__main__":
     #while board is not empty or player chooses to end game; focus on full board for now
     while not isBoardFull(board) and not exitGame and not win:
 
-        board, storeMovesAI, win = moveAI(board, storeMovesAI, storeMovesPlayer, "x");
+        # board, storeMovesAI, win = moveAI(board, storeMovesAI, storeMovesPlayer, "x");
         #if win=true, break loop (unless we're doing the 5 in a row version)
-        # board, storeMovesAI, win, exitGame = movePlayer(board, storeMovesAI, exitGame, "x");
+        board, storeMovesAI, win, exitGame = movePlayer(board, storeMovesAI, exitGame, "x");
         if win or isBoardFull(board) or exitGame:
             break;
         # board, storeMovesPlayer, win, exitGame = movePlayer(board, storeMovesPlayer, exitGame, "o");
@@ -254,4 +276,5 @@ if __name__ == "__main__":
     #out of loop
     # ask player if they want to play again; yes continue, no break
 
-#issue: if player moves first into a corner, ai moves middle, then player moves in the same diagnal, humans can win. 
+#issue: if player moves middle, ai moves [1,1], human moves [3,3], ai moves [1,2], humans moves [1,3] and have a 2 way win
+#       ai sees no space in diagonals of last ai move, so it moves the first avaliable space thats neutral, WIP
