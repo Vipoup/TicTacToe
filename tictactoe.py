@@ -80,6 +80,21 @@ def moveAI(board, storeMovesAI, storeMovesPlayer, letter):
             board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]+1], storeMovesAI, letter);
         else:
             board, storeMovesAI = move(board, neutralMove.pop(0), storeMovesAI, letter);
+    elif len(neutralMove) != 0 and len(storeMovesPlayer) != 0:
+        prevMove = storeMovesPlayer.pop(-1);
+        storeMovesPlayer.append(prevMove);
+
+        #corners are more powerful
+        if [prevMove[0]-1, prevMove[1]-1] in neutralMove:
+            board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]-1], storeMovesAI, letter);
+        elif [prevMove[0]-1, prevMove[1]+1] in neutralMove:
+            board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]+1], storeMovesAI, letter);
+        elif [prevMove[0]+1, prevMove[1]-1] in neutralMove:
+            board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]-1], storeMovesAI, letter);
+        elif [prevMove[0]+1, prevMove[1]+1] in neutralMove:
+            board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]+1], storeMovesAI, letter);
+        else:
+            board, storeMovesAI = move(board, neutralMove.pop(0), storeMovesAI, letter);
     else:
         board, storeMovesAI = move(board, neutralMove.pop(len(neutralMove)//2), storeMovesAI, letter);
 
@@ -227,14 +242,16 @@ if __name__ == "__main__":
         board, storeMovesAI, win = moveAI(board, storeMovesAI, storeMovesPlayer, "x");
         #if win=true, break loop (unless we're doing the 5 in a row version)
         # board, storeMovesAI, win, exitGame = movePlayer(board, storeMovesAI, exitGame, "x");
-        if win or isBoardFull(board):
+        if win or isBoardFull(board) or exitGame:
             break;
-        board, storeMovesPlayer, win, exitGame = movePlayer(board, storeMovesPlayer, exitGame, "o");
+        # board, storeMovesPlayer, win, exitGame = movePlayer(board, storeMovesPlayer, exitGame, "o");
         #if win=true, break loop (unless we're doing the 5 in a row version)
-        # board, storeMovesPlayer, win = moveAI(board, storeMovesPlayer, storeMovesAI, "o");
+        board, storeMovesPlayer, win = moveAI(board, storeMovesPlayer, storeMovesAI, "o");
 
     if win == False and not exitGame:
         print("Draw.");
 
     #out of loop
     # ask player if they want to play again; yes continue, no break
+
+#issue: if player moves first into a corner, ai moves middle, then player moves in the same diagnal, humans can win. 
