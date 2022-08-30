@@ -43,21 +43,6 @@ def move(board, coords, storeMoves, letter):
     board[coords[0]][coords[1]] = letter; # place on board
     return board, storeMoves;
 
-# def optimalMove(emptySpaces, storeMovesAI, storeMovesPlayer):
-#     spaceAI = checkNextMove(emptySpaces[0], storeMovesAI);
-#     if spaceAI == 1:
-#         return emptySpaces[0];
-#     elif spaceAI == 0:
-#         for i in range(len(emptySpaces)):
-#             x = copy.deepcopy(emptySpaces);
-#             storeMovesAI.append(x.pop(i));
-#             for j in range(len(x)):
-#                 y = copy.deepcopy(x);
-#                 if checkNextMove(x[j-1], storeMovesPlayer) == 1:
-#                     return x[j-1];
-#                 storeMovesPlayer.append(x.pop(j-1));
-#                 optimalMove(x, storeMovesAI, storeMovesPlayer);
-
 #AI moves
 def moveAI(board, storeMovesAI, storeMovesPlayer, letter):
 
@@ -75,20 +60,28 @@ def moveAI(board, storeMovesAI, storeMovesPlayer, letter):
             losingMove.append(space);
         elif checkNextAI == 0 or checkNextPlayer == 0:
             neutralMove.append(space);
-            #probably need to optimize for if there is a next "best move"
-
-    # tempEmptySpaces = copy.deepcopy(emptySpaces);
-    # tempMovesAI = copy.deepcopy(storeMovesAI);
-    # tempMovesPlayer = copy.deepcopy(storeMovesPlayer);
-    # nextMove = optimalMove(tempEmptySpaces, tempMovesAI, tempMovesPlayer);
     
     if len(winningMove) != 0:
         board, storeMovesAI = move(board, winningMove.pop(0), storeMovesAI, letter);
     elif len(losingMove) != 0:
         board, storeMovesAI = move(board, losingMove.pop(0), storeMovesAI, letter);
-    elif len(neutralMove) != 0:
-        board, storeMovesAI = move(board, neutralMove.pop(0), storeMovesAI, letter);
-        #once again, need to optimize somehow
+    elif len(neutralMove) != 0 and len(storeMovesAI) != 0:
+        prevMove = storeMovesAI.pop(-1);
+        storeMovesAI.append(prevMove);
+
+        #corners are more powerful
+        if [prevMove[0]-1, prevMove[1]-1] in neutralMove:
+            board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]-1], storeMovesAI, letter);
+        elif [prevMove[0]-1, prevMove[1]+1] in neutralMove:
+            board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]+1], storeMovesAI, letter);
+        elif [prevMove[0]+1, prevMove[1]-1] in neutralMove:
+            board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]-1], storeMovesAI, letter);
+        elif [prevMove[0]+1, prevMove[1]+1] in neutralMove:
+            board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]+1], storeMovesAI, letter);
+        else:
+            board, storeMovesAI = move(board, neutralMove.pop(0), storeMovesAI, letter);
+    else:
+        board, storeMovesAI = move(board, neutralMove.pop(len(neutralMove)//2), storeMovesAI, letter);
 
     printBoard(board);
     movedAI = str(storeMovesAI[len(storeMovesAI)-1]);
