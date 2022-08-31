@@ -29,13 +29,6 @@ def printBoard(board):
         if(row != rows-1):
             print("--"*columns);
 
-# checkNextMove
-def checkNextMove(space, storeMoves):
-    tempStoreMoves = copy.deepcopy(storeMoves);
-    tempStoreMoves.append(space);
-    if checkWin(tempStoreMoves):
-        return 1;
-    return 0;
 
 def move(board, coords, storeMoves, letter):
     storeMoves.append(coords); # add coords to array
@@ -43,94 +36,76 @@ def move(board, coords, storeMoves, letter):
     board[coords[0]][coords[1]] = letter; # place on board
     return board, storeMoves;
 
-#AI moves
-def moveAI(board, storeMovesAI, storeMovesPlayer, letter):
-
+def minimax(board, letter, letterAI, letterPlayer, possibleMovesAll):
     emptySpaces = findEmptySpaces(board);
-    winningMove = [];
-    losingMove = [];
-    neutralMove = [];
+    if checkWin(board, letterPlayer):
+        return -1;
+    elif checkWin(board, letterAI):
+        return 1;
+    elif len(emptySpaces) == 0:
+        return 0;
 
-    for space in emptySpaces:
-        checkNextAI = checkNextMove(space, storeMovesAI);
-        checkNextPlayer = checkNextMove(space, storeMovesPlayer);
-        if checkNextAI == 1:
-            winningMove.append(space);
-        elif checkNextPlayer == 1:
-            losingMove.append(space);
-        elif checkNextAI == 0 or checkNextPlayer == 0:
-            neutralMove.append(space);
-    
-    if len(winningMove) != 0:
-        board, storeMovesAI = move(board, winningMove.pop(0), storeMovesAI, letter);
-    elif len(losingMove) != 0:
-        board, storeMovesAI = move(board, losingMove.pop(0), storeMovesAI, letter);
-    elif len(neutralMove) != 0 and len(storeMovesAI) != 0:
-        prevMove = storeMovesAI.pop(-1);
-        storeMovesAI.append(prevMove);
-        #if diagnal placement
-        if [prevMove[0]-1, prevMove[1]-1] in storeMovesPlayer \
-        and [prevMove[0]+1, prevMove[1]+1] in storeMovesPlayer:
-            #move in cardinal direction
-            if [prevMove[0]-1, prevMove[1]] in neutralMove:
-                board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]], storeMovesAI, letter);
-            elif [prevMove[0]+1, prevMove[1]] in neutralMove:
-                board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]], storeMovesAI, letter);
-            elif [prevMove[0], prevMove[1]-1] in neutralMove:
-                board, storeMovesAI = move(board, [prevMove[0], prevMove[1]-1], storeMovesAI, letter);
-            elif [prevMove[0], prevMove[1]+1] in neutralMove:
-                board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]+1], storeMovesAI, letter);
-        elif [prevMove[0]-1, prevMove[1]+1] in storeMovesPlayer \
-        and [prevMove[0]+1, prevMove[1]-1] in storeMovesPlayer:
-            #move in cardinal direction
-            if [prevMove[0]-1, prevMove[1]] in neutralMove:
-                board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]], storeMovesAI, letter);
-            elif [prevMove[0]+1, prevMove[1]] in neutralMove:
-                board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]], storeMovesAI, letter);
-            elif [prevMove[0], prevMove[1]-1] in neutralMove:
-                board, storeMovesAI = move(board, [prevMove[0], prevMove[1]-1], storeMovesAI, letter);
-            elif [prevMove[0], prevMove[1]+1] in neutralMove:
-                board, storeMovesAI = move(board, [prevMove[0], prevMove[1]+1], storeMovesAI, letter);
-        #corners are more powerful otherwise
-        elif [prevMove[0]-1, prevMove[1]-1] in neutralMove:
-            board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]-1], storeMovesAI, letter);
-        elif [prevMove[0]-1, prevMove[1]+1] in neutralMove:
-            board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]+1], storeMovesAI, letter);
-        elif [prevMove[0]+1, prevMove[1]-1] in neutralMove:
-            board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]-1], storeMovesAI, letter);
-        elif [prevMove[0]+1, prevMove[1]+1] in neutralMove:
-            board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]+1], storeMovesAI, letter);
-        else:
-            board, storeMovesAI = move(board, neutralMove.pop(0), storeMovesAI, letter);
-    elif len(neutralMove) != 0 and len(storeMovesPlayer) != 0:
-        prevMove = storeMovesPlayer.pop(-1);
-        storeMovesPlayer.append(prevMove);
+    for i in range(len(emptySpaces)):
+        currentMoveInfo = {};
+        currentMoveInfo["index"] = emptySpaces[i];
+        tempBoard = copy.deepcopy(board);
+        space = emptySpaces[i];
+        tempBoard[space[0]][space[1]] = letter;
 
-        #corners are more powerful
-        if [prevMove[0]-1, prevMove[1]-1] in neutralMove:
-            board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]-1], storeMovesAI, letter);
-        elif [prevMove[0]-1, prevMove[1]+1] in neutralMove:
-            board, storeMovesAI = move(board, [prevMove[0]-1, prevMove[1]+1], storeMovesAI, letter);
-        elif [prevMove[0]+1, prevMove[1]-1] in neutralMove:
-            board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]-1], storeMovesAI, letter);
-        elif [prevMove[0]+1, prevMove[1]+1] in neutralMove:
-            board, storeMovesAI = move(board, [prevMove[0]+1, prevMove[1]+1], storeMovesAI, letter);
+        if letter == letterAI:
+            result = minimax(tempBoard, letterPlayer, letterAI, letterPlayer, possibleMovesAll);
+            currentMoveInfo["score"] = result;
         else:
-            board, storeMovesAI = move(board, neutralMove.pop(0), storeMovesAI, letter);
-    else:
-        board, storeMovesAI = move(board, neutralMove.pop(len(neutralMove)//2), storeMovesAI, letter);
+            result = minimax(tempBoard, letterAI, letterAI, letterPlayer, possibleMovesAll);
+            currentMoveInfo["score"] = result;
+
+        space = emptySpaces[i];
+        tempBoard[space[0]][space[1]] = " ";
+
+        possibleMovesAll.append(currentMoveInfo);
+
+        bestTestPlay = 0;
+
+        if letter == letterAI:
+            bestScore = -1000;
+            for i in range(len(possibleMovesAll)):
+                current = possibleMovesAll[i];
+                currentScore = float(current["score"]);
+                if currentScore > bestScore:
+                    bestScore = current["score"];
+                    bestTestPlay = i;
+        else:
+            bestScore = 1000;
+            for i in range(len(possibleMovesAll)):
+                current = possibleMovesAll[i];
+                currentScore = float(current["score"]);
+                if currentScore < bestScore:
+                    bestScore = current["score"];
+                    bestTestPlay = i;
+        
+        return possibleMovesAll[bestTestPlay];
+
+
+#AI moves
+def moveAI(board, storeMovesAI, storeMovesPlayer, letterAI, letterPlayer):
+
+    possibleMovesAll = [];
+    bestPlay = minimax(board, letterAI, letterAI, letterPlayer, possibleMovesAll);
+
+    bestPlaySpace = bestPlay["index"];
+    board[bestPlaySpace[0]][bestPlaySpace[1]] = letterAI;
 
     printBoard(board);
     # make AI output easier to understand for humans
     # take the last move AI made
-    lastMoved = storeMovesAI[len(storeMovesAI)-1];
+    lastMoved = storeMovesAI[bestPlaySpace];
     # add 1 for readability
-    output = [lastMoved[0]+1, lastMoved[1]+1];
+    output = [bestPlaySpace[0]+1, bestPlaySpace[1]+1];
     #turn to str to concat
     movedAI = str(output);
     print("AI moved "+ movedAI + ".\n");
 
-    win = checkWin(storeMovesAI);
+    win = checkWin(board, letterAI);
     if win:
         print("Computer has won.");
 
@@ -200,7 +175,7 @@ def movePlayer(board, storeMovesPlayer, exitGame, letter):
     printBoard(board);
     print();
 
-    win = checkWin(storeMovesPlayer);
+    win = checkWin(board, letter);
     if win:
         print("Player has won!");
 
@@ -221,10 +196,15 @@ def isBoardFull(board):
     return True;
 
 #check if a given array has a win
-def checkWin(storeMoves):
+def checkWin(board, letter):
     #check win by looking at all the moves 
-    # (stored as an array of an array of moves e.g. [[1,1],[0,0],[2,2]])
-    #if they do win, return something to break the loop
+    # get all moves done by the letter, then check if there are any 3 in a rows
+    storeMoves = [];
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == letter:
+                storeMoves.append([i, j]);
+
     for move in storeMoves:
         if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves:
             # left to right diagnal
@@ -261,14 +241,14 @@ if __name__ == "__main__":
     #while board is not empty or player chooses to end game; focus on full board for now
     while not isBoardFull(board) and not exitGame and not win:
 
-        # board, storeMovesAI, win = moveAI(board, storeMovesAI, storeMovesPlayer, "x");
+        board, storeMovesAI, win = moveAI(board, storeMovesAI, storeMovesPlayer, "x", "o");
         #if win=true, break loop (unless we're doing the 5 in a row version)
-        board, storeMovesAI, win, exitGame = movePlayer(board, storeMovesAI, exitGame, "x");
+        # board, storeMovesAI, win, exitGame = movePlayer(board, storeMovesAI, exitGame, "x");
         if win or isBoardFull(board) or exitGame:
             break;
         # board, storeMovesPlayer, win, exitGame = movePlayer(board, storeMovesPlayer, exitGame, "o");
         #if win=true, break loop (unless we're doing the 5 in a row version)
-        board, storeMovesPlayer, win = moveAI(board, storeMovesPlayer, storeMovesAI, "o");
+        board, storeMovesPlayer, win = moveAI(board, storeMovesPlayer, storeMovesAI, "o", "x");
 
     if win == False and not exitGame:
         print("Draw.");
