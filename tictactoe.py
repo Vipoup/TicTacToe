@@ -28,59 +28,76 @@ def printBoard(board):
         if(row != rows-1):
             print("--"*columns);
 
+#minimax algorithm
 def minimax(board, depth, maximizer, alpha, beta, letterAI, letterPlayer):
     emptySpaces = findEmptySpaces(board);
+
+    # if terminal state is found
     if checkWin(board, letterPlayer):
-        return -1;
+        return -10 + depth;
     elif checkWin(board, letterAI):
-        return 1;
+        return 10 - depth;
     elif len(emptySpaces) == 0:
         return 0;
 
+    # if current state is maximizer
     if maximizer:
+        # start the value at the smallest value so the first check will be higher
         best = MIN;
-        for i in range(len(emptySpaces)):   
+        for i in range(len(emptySpaces)): 
+            # get array/placement/value of the empty space  
             space = emptySpaces[i];
+            # set the value to the AI's letter
             board[space[0]][space[1]] = letterAI;
+            # recursively call minimax to see if it returns 1/-1. get max value
             best = max(best, minimax(board, depth+1, not maximizer, alpha, beta, letterAI, letterPlayer));
+            # update alpha
             alpha = max(alpha, best);
+            # undo the move
             board[space[0]][space[1]] = " ";
-
+            # alpha beta pruning
             if beta <= alpha:
                 break;
-
         return best;
+    # if current state is minimizer
     else:
+        # start the value at the largest value so the first check will be lower
         best = MAX;
-        for i in range(len(emptySpaces)):        
+        for i in range(len(emptySpaces)):
+            # get array/placement/value of the empty space        
             space = emptySpaces[i];
+            # set the value to the Player's letter
             board[space[0]][space[1]] = letterPlayer;
+            # recursively call minimax to see if it returns 1/-1. get min value
             best = min(best, minimax(board, depth+1, not maximizer, alpha, beta, letterAI, letterPlayer));
+            # update beta
             beta = min(beta, best);
+            # undo the move
             board[space[0]][space[1]]= " ";
-
+            # alpha beta pruning
             if beta <= alpha:
                 break;
-
         return best;
 
+# find next best move
 def nextBestMove(board, letterAI, letterPlayer):
-    bestVal = -10;
+    bestVal = -1000;
     bestMove = [];
     emptySpaces = findEmptySpaces(board);
 
+    # check all empty spaces
     for i in range(len(emptySpaces)): 
+        # move
         space = emptySpaces[i];
-
         board[space[0]][space[1]] = letterAI;
 
+        # check value of this move
         moveVal = minimax(board, 0, False, MIN, MAX, letterAI, letterPlayer);
 
+        # undo move
         board[space[0]][space[1]] = " ";
 
-        # If the value of the current move is
-        # more than the best value, then update
-        # best/
+        # if current move better than bestmove, update bestmove
         if (moveVal > bestVal):			
             bestMove = emptySpaces[i];
             bestVal = moveVal;
@@ -89,15 +106,15 @@ def nextBestMove(board, letterAI, letterPlayer):
 
 #AI moves
 def moveAI(board, letterAI, letterPlayer):
+    # find best play
     bestPlay = nextBestMove(board, letterAI, letterPlayer);
 
+    # move
     board[bestPlay[0]][bestPlay[1]] = letterAI;
 
     printBoard(board);
-    # make AI output easier to understand for humans
-    # take the last move AI made
-    # lastMoved = storeMovesAI[bestPlaySpace];
 
+    # make AI output easier to understand for humans
     # add 1 for readability
     output = [bestPlay[0]+1, bestPlay[1]+1];
     #turn to str to concat
@@ -231,7 +248,7 @@ if __name__ == "__main__":
     print();
     exitGame = False;
     win = False;
-    MIN, MAX = -10, 10;
+    MIN, MAX = -1000, 1000;
 
     #while board is not empty or player chooses to end game; focus on full board for now
     while not isBoardFull(board) and not exitGame and not win:
@@ -251,5 +268,4 @@ if __name__ == "__main__":
     #out of loop
     # ask player if they want to play again; yes continue, no break
 
-#issue: if player moves middle, ai moves [1,1], human moves [3,3], ai moves [1,2], humans moves [1,3] and have a 2 way win
-#       ai sees no space in diagonals of last ai move, so it moves the first avaliable space thats neutral, WIP
+#issue: takes too long in a board greater than 3x3 and doesnt make best move
