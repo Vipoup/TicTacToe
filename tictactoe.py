@@ -3,7 +3,6 @@
 # CSCI 4307
 # AI TicTacToe
 import re;
-import copy;
 
 #create board based on given dimensions, return board
 def makeBoard():
@@ -29,7 +28,7 @@ def printBoard(board):
         if(row != rows-1):
             print("--"*columns);
 
-def minimax(board, depth, maximizer, letterAI, letterPlayer):
+def minimax(board, depth, maximizer, alpha, beta, letterAI, letterPlayer):
     emptySpaces = findEmptySpaces(board);
     if checkWin(board, letterPlayer):
         return -1;
@@ -39,25 +38,35 @@ def minimax(board, depth, maximizer, letterAI, letterPlayer):
         return 0;
 
     if maximizer:
-        best = -1000;
+        best = MIN;
         for i in range(len(emptySpaces)):   
             space = emptySpaces[i];
             board[space[0]][space[1]] = letterAI;
-            best = max(best, minimax(board, depth + 1, not maximizer, letterAI, letterPlayer))
+            best = max(best, minimax(board, depth+1, not maximizer, alpha, beta, letterAI, letterPlayer));
+            alpha = max(alpha, best);
             board[space[0]][space[1]] = " ";
-        return best  
+
+            if beta <= alpha:
+                break;
+
+        return best;
     else:
-        best = 1000
+        best = MAX;
         for i in range(len(emptySpaces)):        
             space = emptySpaces[i];
             board[space[0]][space[1]] = letterPlayer;
-            best = min(best, minimax(board, depth + 1, not maximizer, letterAI, letterPlayer))
+            best = min(best, minimax(board, depth+1, not maximizer, alpha, beta, letterAI, letterPlayer));
+            beta = min(beta, best);
             board[space[0]][space[1]]= " ";
-        return best
+
+            if beta <= alpha:
+                break;
+
+        return best;
 
 def nextBestMove(board, letterAI, letterPlayer):
-    bestVal = -1000;
-    bestMove = (-1, -1);
+    bestVal = -10;
+    bestMove = [];
     emptySpaces = findEmptySpaces(board);
 
     for i in range(len(emptySpaces)): 
@@ -65,9 +74,9 @@ def nextBestMove(board, letterAI, letterPlayer):
 
         board[space[0]][space[1]] = letterAI;
 
-        moveVal = minimax(board, 0, False, letterAI, letterPlayer);
+        moveVal = minimax(board, 0, False, MIN, MAX, letterAI, letterPlayer);
 
-        board[space[0]][space[1]] = ' ';
+        board[space[0]][space[1]] = " ";
 
         # If the value of the current move is
         # more than the best value, then update
@@ -80,8 +89,7 @@ def nextBestMove(board, letterAI, letterPlayer):
 
 #AI moves
 def moveAI(board, letterAI, letterPlayer):
-    tempBoard = copy.deepcopy(board);
-    bestPlay = nextBestMove(tempBoard, letterAI, letterPlayer);
+    bestPlay = nextBestMove(board, letterAI, letterPlayer);
 
     board[bestPlay[0]][bestPlay[1]] = letterAI;
 
@@ -223,13 +231,14 @@ if __name__ == "__main__":
     print();
     exitGame = False;
     win = False;
+    MIN, MAX = -10, 10;
 
     #while board is not empty or player chooses to end game; focus on full board for now
     while not isBoardFull(board) and not exitGame and not win:
 
-        # board, win = moveAI(board, "x", "o");
+        board, win = moveAI(board, "x", "o");
         #if win=true, break loop (unless we're doing the 5 in a row version)
-        board, win, exitGame = movePlayer(board, exitGame, "x");
+        # board, win, exitGame = movePlayer(board, exitGame, "x");
         if win or isBoardFull(board) or exitGame:
             break;
         # board, win, exitGame = movePlayer(board, exitGame, "o");
