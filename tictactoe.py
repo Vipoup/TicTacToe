@@ -29,21 +29,14 @@ def printBoard(board):
         if(row != rows-1):
             print("--"*columns);
 
-
-def move(board, coords, storeMoves, letter):
-    storeMoves.append(coords); # add coords to array
-
-    board[coords[0]][coords[1]] = letter; # place on board
-    return board, storeMoves;
-
 def minimax(board, letter, letterAI, letterPlayer, possibleMovesAll):
     emptySpaces = findEmptySpaces(board);
     if checkWin(board, letterPlayer):
-        return -1;
+        return {"score": -1};
     elif checkWin(board, letterAI):
-        return 1;
+        return {"score": 1};
     elif len(emptySpaces) == 0:
-        return 0;
+        return {"score": 0};
 
     for i in range(len(emptySpaces)):
         currentMoveInfo = {};
@@ -54,10 +47,10 @@ def minimax(board, letter, letterAI, letterPlayer, possibleMovesAll):
 
         if letter == letterAI:
             result = minimax(tempBoard, letterPlayer, letterAI, letterPlayer, possibleMovesAll);
-            currentMoveInfo["score"] = result;
+            currentMoveInfo.update(result);
         else:
             result = minimax(tempBoard, letterAI, letterAI, letterPlayer, possibleMovesAll);
-            currentMoveInfo["score"] = result;
+            currentMoveInfo.update(result);
 
         space = emptySpaces[i];
         tempBoard[space[0]][space[1]] = " ";
@@ -87,7 +80,7 @@ def minimax(board, letter, letterAI, letterPlayer, possibleMovesAll):
 
 
 #AI moves
-def moveAI(board, storeMovesAI, storeMovesPlayer, letterAI, letterPlayer):
+def moveAI(board, letterAI, letterPlayer):
 
     possibleMovesAll = [];
     bestPlay = minimax(board, letterAI, letterAI, letterPlayer, possibleMovesAll);
@@ -98,7 +91,8 @@ def moveAI(board, storeMovesAI, storeMovesPlayer, letterAI, letterPlayer):
     printBoard(board);
     # make AI output easier to understand for humans
     # take the last move AI made
-    lastMoved = storeMovesAI[bestPlaySpace];
+    # lastMoved = storeMovesAI[bestPlaySpace];
+
     # add 1 for readability
     output = [bestPlaySpace[0]+1, bestPlaySpace[1]+1];
     #turn to str to concat
@@ -109,7 +103,7 @@ def moveAI(board, storeMovesAI, storeMovesPlayer, letterAI, letterPlayer):
     if win:
         print("Computer has won.");
 
-    return board, storeMovesAI, win;
+    return board, win;
 
 def findEmptySpaces(board):
     rows = len(board);
@@ -126,7 +120,7 @@ def findEmptySpaces(board):
     return emptySpaces;
 
 #Player moves
-def movePlayer(board, storeMovesPlayer, exitGame, letter):
+def movePlayer(board, exitGame, letter):
     rows = len(board);
     columns = len(board[0]);
     check = True;
@@ -141,7 +135,7 @@ def movePlayer(board, storeMovesPlayer, exitGame, letter):
         # if user wants to exit
         if re.search("[Ee]xit", move):
             exitGame = True;
-            return board, storeMovesPlayer, False, exitGame;
+            return board, False, exitGame;
 
         # if input is in num,num format
         if re.search("^[0-9]*,[0-9]*$", move):
@@ -167,9 +161,6 @@ def movePlayer(board, storeMovesPlayer, exitGame, letter):
     coords[0] = coords[0]-1;
     coords[1] = coords[1]-1;
 
-    # board, storeMovesPlayer = move(board, coords, storeMovesPlayer, "o"); # crashes for some reason
-    storeMovesPlayer.append(coords); # add coords to array
-
     board[coords[0]][coords[1]] = letter; # place on board
 
     printBoard(board);
@@ -179,7 +170,7 @@ def movePlayer(board, storeMovesPlayer, exitGame, letter):
     if win:
         print("Player has won!");
 
-    return board, storeMovesPlayer, win, exitGame;
+    return board, win, exitGame;
 
 #Check if board is full
 # if board is full, return true. 
@@ -235,20 +226,18 @@ if __name__ == "__main__":
     print();
     exitGame = False;
     win = False;
-    storeMovesAI = [];
-    storeMovesPlayer = [];
 
     #while board is not empty or player chooses to end game; focus on full board for now
     while not isBoardFull(board) and not exitGame and not win:
 
-        board, storeMovesAI, win = moveAI(board, storeMovesAI, storeMovesPlayer, "x", "o");
+        board, win = moveAI(board, "x", "o");
         #if win=true, break loop (unless we're doing the 5 in a row version)
-        # board, storeMovesAI, win, exitGame = movePlayer(board, storeMovesAI, exitGame, "x");
+        # board, win, exitGame = movePlayer(board, exitGame, "x");
         if win or isBoardFull(board) or exitGame:
             break;
-        # board, storeMovesPlayer, win, exitGame = movePlayer(board, storeMovesPlayer, exitGame, "o");
+        # board, win, exitGame = movePlayer(board, exitGame, "o");
         #if win=true, break loop (unless we're doing the 5 in a row version)
-        board, storeMovesPlayer, win = moveAI(board, storeMovesPlayer, storeMovesAI, "o", "x");
+        board, win = moveAI(board, "o", "x");
 
     if win == False and not exitGame:
         print("Draw.");
