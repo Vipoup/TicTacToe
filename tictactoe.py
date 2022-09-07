@@ -31,10 +31,10 @@ def minimax(board, depth, maximizer, alpha, beta, letterAI, letterPlayer):
 
     # if terminal state is found
     if checkWin(board, letterPlayer):
-        return -10 + depth;
+        return -10 - depth;
     elif checkWin(board, letterAI):
-        return 10 - depth;
-    elif len(emptySpaces) == 0:
+        return 10 + depth;
+    elif len(emptySpaces) == 0 or depth == 0:
         return 0;
 
     # if current state is maximizer
@@ -47,7 +47,7 @@ def minimax(board, depth, maximizer, alpha, beta, letterAI, letterPlayer):
             # set the value to the AI's letter
             board[space[0]][space[1]] = letterAI;
             # recursively call minimax to see if it returns 1/-1. get max value
-            best = max(best, minimax(board, depth+1, not maximizer, alpha, beta, letterAI, letterPlayer));
+            best = max(best, minimax(board, depth-1, not maximizer, alpha, beta, letterAI, letterPlayer));
             # update alpha
             alpha = max(alpha, best);
             # undo the move
@@ -66,7 +66,7 @@ def minimax(board, depth, maximizer, alpha, beta, letterAI, letterPlayer):
             # set the value to the Player's letter
             board[space[0]][space[1]] = letterPlayer;
             # recursively call minimax to see if it returns 1/-1. get min value
-            best = min(best, minimax(board, depth+1, not maximizer, alpha, beta, letterAI, letterPlayer));
+            best = min(best, minimax(board, depth-1, not maximizer, alpha, beta, letterAI, letterPlayer));
             # update beta
             beta = min(beta, best);
             # undo the move
@@ -89,7 +89,7 @@ def nextBestMove(board, letterAI, letterPlayer):
         board[space[0]][space[1]] = letterAI;
 
         # check value of this move
-        moveVal = minimax(board, 0, False, MIN, MAX, letterAI, letterPlayer);
+        moveVal = minimax(board, 3, False, MIN, MAX, letterAI, letterPlayer);
 
         # undo move
         board[space[0]][space[1]] = " ";
