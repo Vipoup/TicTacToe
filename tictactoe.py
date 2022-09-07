@@ -140,16 +140,20 @@ def checkWin(board, letter):
                 storeMoves.append([i, j]);
 
     for move in storeMoves:
-        if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves:
+        if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves \
+            and [move[0]-2, move[1]-2] in storeMoves and [move[0]+2, move[1]+2] in storeMoves:
             # left to right diagnal
             return True;
-        elif [move[0]-1, move[1]] in storeMoves and [move[0]+1, move[1]] in storeMoves:
+        elif [move[0]-1, move[1]] in storeMoves and [move[0]+1, move[1]] in storeMoves\
+            and [move[0]-2, move[1]] in storeMoves and [move[0]+2, move[1]] in storeMoves:
             # up and down; vertical
             return True;
-        elif [move[0], move[1]-1] in storeMoves and [move[0], move[1]+1] in storeMoves:
+        elif [move[0], move[1]-1] in storeMoves and [move[0], move[1]+1] in storeMoves\
+            and [move[0], move[1]-2] in storeMoves and [move[0]+2, move[1]+2] in storeMoves:
             # left and right; horizontal
             return True;
-        elif [move[0]-1, move[1]+1] in storeMoves and [move[0]+1, move[1]-1] in storeMoves:
+        elif [move[0]-1, move[1]+1] in storeMoves and [move[0]+1, move[1]-1] in storeMoves\
+            and [move[0]-2, move[1]+2] in storeMoves and [move[0]+2, move[1]-2] in storeMoves:
             # right to left diagnal 
             return True;
     return False;
