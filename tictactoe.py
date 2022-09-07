@@ -101,6 +101,7 @@ def nextBestMove(board, letterAI, letterPlayer):
     
     return bestMove;
 
+#get all empty spaces in board
 def findEmptySpaces(board):
     rows = len(board);
     columns = len(board[0]);
@@ -181,6 +182,7 @@ def moveAI(board, letterAI, letterPlayer):
 
     return board, win;
 
+#Player moves
 def movePlayer(board, exitGame, letter):
     rows = len(board);
     columns = len(board[0]);
@@ -233,6 +235,7 @@ def movePlayer(board, exitGame, letter):
 
     return board, win, exitGame;
 
+#Create new game
 def newGame():
     MINBOARD, MAXBOARD = 5, 25;
     check = True;
@@ -263,13 +266,6 @@ def newGame():
 
 #main
 if __name__ == "__main__":
-    #eventually, while true(or until user ends)
-    #ask play vs AI, or pvp, or AIvAI; focus on PvsAI for now
-    #could ask for who goes first; AI goes first for now
-    #   could make class for AI/Player, have a func called move,
-    #   then be able to make it more dynamic for if they want
-    #   pvp, aivai, pvai, and who goes first. Do later
-    #Ask user for board size, hardcoded for now for 3x3
     print("Welcome to 5-In-A-Row.");
     exitProgram = False;
     checkMain = True;
