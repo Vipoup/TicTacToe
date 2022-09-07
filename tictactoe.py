@@ -150,7 +150,7 @@ def checkWin(board, letter):
             # up and down; vertical
             return True;
         elif [move[0], move[1]-1] in storeMoves and [move[0], move[1]+1] in storeMoves\
-            and [move[0], move[1]-2] in storeMoves and [move[0]+2, move[1]+2] in storeMoves:
+            and [move[0], move[1]-2] in storeMoves and [move[0], move[1]+2] in storeMoves:
             # left and right; horizontal
             return True;
         elif [move[0]-1, move[1]+1] in storeMoves and [move[0]+1, move[1]-1] in storeMoves\
@@ -273,6 +273,7 @@ if __name__ == "__main__":
         print("Would you like to play:");
         print("\t1) Computer vs Player");
         print("\t2) Player vs Computer");
+        print("\t3) Player vs Player");
 
         while checkMain:
             print("To exit program, type 'exit'.");
@@ -281,7 +282,7 @@ if __name__ == "__main__":
             if re.search("[Ee]xit", play):
                 checkMain = False;
                 exitProgram = True;
-            elif re.search("^[12]$", play):
+            elif re.search("^[123]$", play):
                 checkMain = False;
             else:
                 print("Invalid choice, please try again.\n");
@@ -306,6 +307,17 @@ if __name__ == "__main__":
                 if win or isBoardFull(board) or exitGame:
                     break;
                 board, win = moveAI(board, "o", "x");
+
+            if win == False and not exitGame:
+                print("Draw.");
+        elif play == "3":
+            board, exitGame, win, MIN, MAX = newGame();
+            #while board is not empty or player chooses to end game
+            while not isBoardFull(board) and not exitGame and not win:
+                board, win, exitGame = movePlayer(board, exitGame, "x");
+                if win or isBoardFull(board) or exitGame:
+                    break;
+                board, win, exitGame = movePlayer(board, exitGame, "o");
 
             if win == False and not exitGame:
                 print("Draw.");
