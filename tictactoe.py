@@ -104,6 +104,59 @@ def nextBestMove(board, letterAI, letterPlayer):
     
     return bestMove;
 
+def findEmptySpaces(board):
+    rows = len(board);
+    columns = len(board[0]);
+    emptySpaces = [];
+    coords = [];
+
+    # check if there are any empty spots
+    for row in range(rows):
+        for col in range(columns):
+            if board[row][col] == " ":
+                coords = [row, col];
+                emptySpaces.append(coords);
+    return emptySpaces;
+
+#Check if board is full
+# if board is full, return true. 
+# if board finds an empty space, return false 
+def isBoardFull(board):
+    rows = len(board);
+    columns = len(board[0]);
+
+    # check if there are any empty spots
+    for row in range(rows):
+        for col in range(columns):
+            if board[row][col] == " ":
+                return False;
+    return True;
+
+#check if a given array has a win
+def checkWin(board, letter):
+    #check win by looking at all the moves 
+    # get all moves done by the letter, then check if there are any 3 in a rows
+    storeMoves = [];
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == letter:
+                storeMoves.append([i, j]);
+
+    for move in storeMoves:
+        if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves:
+            # left to right diagnal
+            return True;
+        elif [move[0]-1, move[1]] in storeMoves and [move[0]+1, move[1]] in storeMoves:
+            # up and down; vertical
+            return True;
+        elif [move[0], move[1]-1] in storeMoves and [move[0], move[1]+1] in storeMoves:
+            # left and right; horizontal
+            return True;
+        elif [move[0]-1, move[1]+1] in storeMoves and [move[0]+1, move[1]-1] in storeMoves:
+            # right to left diagnal 
+            return True;
+    return False;
+
 #AI moves
 def moveAI(board, letterAI, letterPlayer):
     # find best play
@@ -127,21 +180,6 @@ def moveAI(board, letterAI, letterPlayer):
 
     return board, win;
 
-def findEmptySpaces(board):
-    rows = len(board);
-    columns = len(board[0]);
-    emptySpaces = [];
-    coords = [];
-
-    # check if there are any empty spots
-    for row in range(rows):
-        for col in range(columns):
-            if board[row][col] == " ":
-                coords = [row, col];
-                emptySpaces.append(coords);
-    return emptySpaces;
-
-#Player moves
 def movePlayer(board, exitGame, letter):
     rows = len(board);
     columns = len(board[0]);
@@ -194,44 +232,14 @@ def movePlayer(board, exitGame, letter):
 
     return board, win, exitGame;
 
-#Check if board is full
-# if board is full, return true. 
-# if board finds an empty space, return false 
-def isBoardFull(board):
-    rows = len(board);
-    columns = len(board[0]);
-
-    # check if there are any empty spots
-    for row in range(rows):
-        for col in range(columns):
-            if board[row][col] == " ":
-                return False;
-    return True;
-
-#check if a given array has a win
-def checkWin(board, letter):
-    #check win by looking at all the moves 
-    # get all moves done by the letter, then check if there are any 3 in a rows
-    storeMoves = [];
-    for i in range(len(board)):
-        for j in range(len(board[0])):
-            if board[i][j] == letter:
-                storeMoves.append([i, j]);
-
-    for move in storeMoves:
-        if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves:
-            # left to right diagnal
-            return True;
-        elif [move[0]-1, move[1]] in storeMoves and [move[0]+1, move[1]] in storeMoves:
-            # up and down; vertical
-            return True;
-        elif [move[0], move[1]-1] in storeMoves and [move[0], move[1]+1] in storeMoves:
-            # left and right; horizontal
-            return True;
-        elif [move[0]-1, move[1]+1] in storeMoves and [move[0]+1, move[1]-1] in storeMoves:
-            # right to left diagnal 
-            return True;
-    return False;
+def newGame():
+        board = makeBoard();
+        printBoard(board);
+        print();
+        exitGame = False;
+        win = False;
+        MIN, MAX = -1000, 1000;
+        return board, exitGame, win, MIN, MAX;
 
 #main
 if __name__ == "__main__":
@@ -242,30 +250,53 @@ if __name__ == "__main__":
     #   then be able to make it more dynamic for if they want
     #   pvp, aivai, pvai, and who goes first. Do later
     #Ask user for board size, hardcoded for now for 3x3
+    print("Welcome to 5-In-A-Row.");
+    exitProgram = False;
+    checkMain = True;
+    while not exitProgram:
+        print("Would you like to play:");
+        print("\t1) Computer vs Player");
+        print("\t2) Player vs Computer");
 
-    board = makeBoard();
-    printBoard(board);
-    print();
-    exitGame = False;
-    win = False;
-    MIN, MAX = -1000, 1000;
+        while checkMain:
+            print("To exit program, type 'exit'.");
+            play = input("Please enter a number: ");
 
-    #while board is not empty or player chooses to end game; focus on full board for now
-    while not isBoardFull(board) and not exitGame and not win:
+            if re.search("[Ee]xit", play):
+                checkMain = False;
+                exitProgram = True;
+            elif re.search("^[12]$", play):
+                checkMain = False;
+            else:
+                print("Invalid choice, please try again.\n");
 
-        board, win = moveAI(board, "x", "o");
-        #if win=true, break loop (unless we're doing the 5 in a row version)
-        # board, win, exitGame = movePlayer(board, exitGame, "x");
-        if win or isBoardFull(board) or exitGame:
-            break;
-        # board, win, exitGame = movePlayer(board, exitGame, "o");
-        #if win=true, break loop (unless we're doing the 5 in a row version)
-        board, win = moveAI(board, "o", "x");
+        if play == "1":
+            board, exitGame, win, MIN, MAX = newGame();
 
-    if win == False and not exitGame:
-        print("Draw.");
+            #while board is not empty or player chooses to end game
+            while not isBoardFull(board) and not exitGame and not win:
+                board, win = moveAI(board, "x", "o");
+                if win or isBoardFull(board):
+                    break;
+                board, win, exitGame = movePlayer(board, exitGame, "o");
 
-    #out of loop
-    # ask player if they want to play again; yes continue, no break
+            if win == False and not exitGame:
+                print("Draw.");
+        elif play == "2":
+            board, exitGame, win, MIN, MAX = newGame();
+            #while board is not empty or player chooses to end game
+            while not isBoardFull(board) and not exitGame and not win:
+                board, win, exitGame = movePlayer(board, exitGame, "x");
+                if win or isBoardFull(board) or exitGame:
+                    break;
+                board, win = moveAI(board, "o", "x");
+
+            if win == False and not exitGame:
+                print("Draw.");
+
+        #reset value so player can choose new options
+        checkMain = True;
+
+
 
 #issue: takes too long in a board greater than 3x3 and doesnt make best move
