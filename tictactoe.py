@@ -5,10 +5,7 @@
 import re;
 
 #create board based on given dimensions, return board
-def makeBoard():
-    # will get user input on this later
-    cols = 3;
-    rows = 3;
+def makeBoard(rows, cols):
     #make a blank 2D board based on given rows,columns
     board = [[" " for i in range(cols)] for j in range(rows)]
     return board;
@@ -203,7 +200,7 @@ def movePlayer(board, exitGame, letter):
             # if input is not in the board range
             if int(coords[0]) > rows or int(coords[1]) > columns \
             or int(coords[0]) == 0 or int(coords[1]) == 0:
-                print("The input was not the board range. Please try again.\n");
+                print("The input was not in the board range. Please try again.\n");
             else:
                 # if spot is not taken
                 if board[int(coords[0])-1][int(coords[1])-1] == " ":
@@ -233,13 +230,32 @@ def movePlayer(board, exitGame, letter):
     return board, win, exitGame;
 
 def newGame():
-        board = makeBoard();
-        printBoard(board);
-        print();
-        exitGame = False;
-        win = False;
-        MIN, MAX = -1000, 1000;
-        return board, exitGame, win, MIN, MAX;
+    MINBOARD, MAXBOARD = 5, 25;
+    check = True;
+    exitGame = False;
+    win = False;
+    MIN, MAX = -1000, 1000;
+    while check:
+        print("\nHow large would you like the board?");
+        print("MAX size is 25x25, MIN size is 5x5.");
+        move = input("Enter size of board" +
+        "' (RowxCoulmn e.g. 5x5 for 5x5 board): ");
+
+        # if input is in numxnum format
+        if re.search("^[0-9]*x[0-9]*$", move):
+            size = move.split("x");
+            # if input is not in the board range
+            if int(size[0]) > MAXBOARD or int(size[1]) > MAXBOARD \
+            or int(size[0]) < MINBOARD or int(size[1]) < MINBOARD:
+                print("The input was not the board range. Please try again.");
+            else:
+                check = False;
+        else:
+            print("The input was not in the right format. Please try again.");
+    board = makeBoard(int(size[0]), int(size[1]));
+    printBoard(board);
+    print();
+    return board, exitGame, win, MIN, MAX;
 
 #main
 if __name__ == "__main__":
