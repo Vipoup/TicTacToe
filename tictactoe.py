@@ -3,6 +3,7 @@
 # CSCI 4307
 # AI TicTacToe
 import re;
+from time import monotonic;
 
 #create board based on given dimensions, return board
 def makeBoard(rows, cols):
@@ -320,6 +321,7 @@ def newGame():
 if __name__ == "__main__":
     print("\nWelcome to 5-In-A-Row.");
     exitProgram = False;
+    timer = 600;
     while not exitProgram:
         print("\nWould you like to play:");
         print("\t1) Computer vs Player");
@@ -343,6 +345,8 @@ if __name__ == "__main__":
 
         if play == "1": #Computer vs Player
             board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
+            print("\nThe game will last 10 minutes starting now!\n");
+            start = monotonic();
 
             #while board is not empty or player chooses to end game
             while not isBoardFull(board) and not exitGame:
@@ -350,6 +354,12 @@ if __name__ == "__main__":
                 if isBoardFull(board):
                     break;
                 board, pointPlayer2, exitGame = movePlayer(board, exitGame, "o", pointPlayer2);
+                end = monotonic();
+                time = end-start;
+                if time >= timer:
+                    print("Time has run out.");
+                    break;
+
 
             if pointPlayer1 > pointPlayer2:
                 print("Computer Wins.");
@@ -360,10 +370,17 @@ if __name__ == "__main__":
 
         elif play == "2": #Player vs Computer
             board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
+            print("\nThe game will last 10 minutes starting now!\n");
+            start = monotonic();
 
             #while board is not empty or player chooses to end game
             while not isBoardFull(board) and not exitGame:
                 board, pointPlayer1, exitGame = movePlayer(board, exitGame, "x", pointPlayer1);
+                end = monotonic();
+                time = end-start;
+                if time >= timer:
+                    print("Time has run out.");
+                    break;
                 if isBoardFull(board) or exitGame:
                     break;
                 board, pointPlayer2 = moveAI(board, "o", "x", pointPlayer2);
@@ -377,12 +394,25 @@ if __name__ == "__main__":
 
         elif play == "3": #Player vs Player
             board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
+            print("\nThe game will last 10 minutes starting now!\n");
+            start = monotonic();
+
             #while board is not empty or player chooses to end game
             while not isBoardFull(board) and not exitGame:
                 board, pointPlayer1, exitGame = movePlayer(board, exitGame, "x", pointPlayer1);
                 if isBoardFull(board) or exitGame:
                     break;
+                end = monotonic();
+                time = end-start;
+                if time >= timer:
+                    print("Time has run out.");
+                    break;
                 board, pointPlayer2, exitGame = movePlayer(board, exitGame, "o", pointPlayer2);
+                end = monotonic();
+                time = end-start;
+                if time >= timer:
+                    print("Time has run out.");
+                    break;
             
             if pointPlayer1 > pointPlayer2:
                 print("Player 1 Wins!");
@@ -393,12 +423,20 @@ if __name__ == "__main__":
 
         elif play == "4": # Computer vs Computer
             board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
+            print("\nThe game will last 10 minutes starting now!\n");
+            start = monotonic();
+
             #while board is not empty or player chooses to end game
             while not isBoardFull(board) and not exitGame:
                 board, pointPlayer1 = moveAI(board, "x", "o", pointPlayer1);
                 if isBoardFull(board):
                     break;
                 board, pointPlayer2 = moveAI(board, "o", "x", pointPlayer2);
+                end = monotonic();
+                time = end-start;
+                if time >= timer:
+                    print("Time has run out.");
+                    break;
 
             if pointPlayer1 > pointPlayer2:
                 print("Computer 1 Wins!");
