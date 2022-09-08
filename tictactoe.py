@@ -160,7 +160,7 @@ def checkWin(board, letter):
     return False;
 
 #AI moves
-def moveAI(board, letterAI, letterPlayer):
+def moveAI(board, letterAI, letterPlayer, point):
     # find best play
     bestPlay = nextBestMove(board, letterAI, letterPlayer);
 
@@ -178,12 +178,13 @@ def moveAI(board, letterAI, letterPlayer):
 
     win = checkWin(board, letterAI);
     if win:
-        print("Computer has won.");
-
-    return board, win;
+        print("Computer has gained a point.");
+        board = changeLetter(board, letterAI);
+        point = point + 1;
+    return board, point;
 
 #Player moves
-def movePlayer(board, exitGame, letter):
+def movePlayer(board, exitGame, letter, point):
     rows = len(board);
     columns = len(board[0]);
     check = True;
@@ -198,7 +199,7 @@ def movePlayer(board, exitGame, letter):
         # if user wants to exit
         if re.search("[Ee]xit", move):
             exitGame = True;
-            return board, False, exitGame;
+            return board, point, exitGame;
 
         # if input is in num,num format
         if re.search("^[0-9]*,[0-9]*$", move):
@@ -231,9 +232,57 @@ def movePlayer(board, exitGame, letter):
 
     win = checkWin(board, letter);
     if win:
-        print("Player has won!");
+        print("Player has gained a point!");
+        board = changeLetter(board, letter);
+        point = point + 1;
 
-    return board, win, exitGame;
+    return board, point, exitGame;
+
+def changeLetter(board, letter):
+    storeMoves = [];
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == letter:
+                storeMoves.append([i, j]);
+
+    for move in storeMoves:
+        if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves \
+            and [move[0]-2, move[1]-2] in storeMoves and [move[0]+2, move[1]+2] in storeMoves:
+            # left to right diagnal
+            board[move[0]-1][move[1]-1] = "z";
+            board[move[0]+1][move[1]+1] = "z";
+            board[move[0]-2][move[1]-2] = "z";
+            board[move[0]+2][move[1]+2] = "z";
+            board[move[0]][move[1]] = "z";
+            return board;
+        elif [move[0]-1, move[1]] in storeMoves and [move[0]+1, move[1]] in storeMoves\
+            and [move[0]-2, move[1]] in storeMoves and [move[0]+2, move[1]] in storeMoves:
+            # up and down; vertical
+            board[move[0]-1][move[1]] = "z";
+            board[move[0]+1][move[1]] = "z";
+            board[move[0]-2][move[1]] = "z";
+            board[move[0]+2][move[1]] = "z";
+            board[move[0]][move[1]] = "z";
+            return board;
+        elif [move[0], move[1]-1] in storeMoves and [move[0], move[1]+1] in storeMoves\
+            and [move[0], move[1]-2] in storeMoves and [move[0], move[1]+2] in storeMoves:
+            # left and right; horizontal
+            board[move[0]][move[1]-1] = "z";
+            board[move[0]][move[1]+1] = "z";
+            board[move[0]][move[1]-2] = "z";
+            board[move[0]][move[1]+2] = "z";
+            board[move[0]][move[1]] = "z";
+            return board;
+        elif [move[0]-1, move[1]+1] in storeMoves and [move[0]+1, move[1]-1] in storeMoves\
+            and [move[0]-2, move[1]+2] in storeMoves and [move[0]+2, move[1]-2] in storeMoves:
+            # right to left diagnal 
+            board[move[0]-1][move[1]+1] = "z";
+            board[move[0]+1][move[1]-1] = "z";
+            board[move[0]-2][move[1]+2] = "z";
+            board[move[0]+2][move[1]-2] = "z";
+            board[move[0]][move[1]] = "z";
+            return board;
+    return board;
 
 #Create new game
 def newGame():
@@ -242,6 +291,7 @@ def newGame():
     exitGame = False;
     win = False;
     MIN, MAX = -1000, 1000;
+    pointPlayer1, pointPlayer2 = 0, 0;
     while check:
         print("\nHow large would you like the board?");
         print("MAX size is 25x25, MIN size is 5x5.");
@@ -262,15 +312,15 @@ def newGame():
     board = makeBoard(int(size[0]), int(size[1]));
     printBoard(board);
     print();
-    return board, exitGame, win, MIN, MAX;
+    return board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2;
 
 #main
 if __name__ == "__main__":
-    print("Welcome to 5-In-A-Row.");
+    print("\nWelcome to 5-In-A-Row.");
     exitProgram = False;
     checkMain = True;
     while not exitProgram:
-        print("Would you like to play:");
+        print("\nWould you like to play:");
         print("\t1) Computer vs Player");
         print("\t2) Player vs Computer");
         print("\t3) Player vs Player");
@@ -288,50 +338,70 @@ if __name__ == "__main__":
             else:
                 print("Invalid choice, please try again.\n");
 
-        if play == "1":
-            board, exitGame, win, MIN, MAX = newGame();
+        if play == "1": #Computer vs Player
+            board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
 
             #while board is not empty or player chooses to end game
-            while not isBoardFull(board) and not exitGame and not win:
-                board, win = moveAI(board, "x", "o");
-                if win or isBoardFull(board):
+            while not isBoardFull(board) and not exitGame:
+                board, pointPlayer1 = moveAI(board, "x", "o", pointPlayer1);
+                if isBoardFull(board):
                     break;
-                board, win, exitGame = movePlayer(board, exitGame, "o");
+                board, pointPlayer2, exitGame = movePlayer(board, exitGame, "o", pointPlayer2);
 
-            if win == False and not exitGame:
+            if pointPlayer1 > pointPlayer2:
+                print("Computer Wins.");
+            elif pointPlayer1 < pointPlayer2:
+                print("Player Wins!");
+            elif pointPlayer1 == pointPlayer2:
                 print("Draw.");
-        elif play == "2":
-            board, exitGame, win, MIN, MAX = newGame();
+
+        elif play == "2": #Player vs Computer
+            board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
+
             #while board is not empty or player chooses to end game
             while not isBoardFull(board) and not exitGame and not win:
-                board, win, exitGame = movePlayer(board, exitGame, "x");
-                if win or isBoardFull(board) or exitGame:
+                board, pointPlayer1, exitGame = movePlayer(board, exitGame, "x", pointPlayer1);
+                if isBoardFull(board) or exitGame:
                     break;
-                board, win = moveAI(board, "o", "x");
+                board, pointPlayer2 = moveAI(board, "o", "x", pointPlayer2);
 
-            if win == False and not exitGame:
+            if pointPlayer1 > pointPlayer2:
+                print("Player Wins!");
+            elif pointPlayer1 < pointPlayer2:
+                print("Computer Wins.");
+            elif pointPlayer1 == pointPlayer2:
                 print("Draw.");
-        elif play == "3":
-            board, exitGame, win, MIN, MAX = newGame();
+
+        elif play == "3": #Player vs Player
+            board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
             #while board is not empty or player chooses to end game
             while not isBoardFull(board) and not exitGame and not win:
-                board, win, exitGame = movePlayer(board, exitGame, "x");
-                if win or isBoardFull(board) or exitGame:
+                board, pointPlayer1, exitGame = movePlayer(board, exitGame, "x", pointPlayer1);
+                if isBoardFull(board) or exitGame:
                     break;
-                board, win, exitGame = movePlayer(board, exitGame, "o");
-
-            if win == False and not exitGame:
+                board, pointPlayer2, exitGame = movePlayer(board, exitGame, "o", pointPlayer2);
+            
+            if pointPlayer1 > pointPlayer2:
+                print("Player 1 Wins!");
+            elif pointPlayer1 < pointPlayer2:
+                print("Player 2 Wins!");
+            elif pointPlayer1 == pointPlayer2:
                 print("Draw.");
-        elif play == "4":
-            board, exitGame, win, MIN, MAX = newGame();
+
+        elif play == "4": # Computer vs Computer
+            board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
             #while board is not empty or player chooses to end game
             while not isBoardFull(board) and not exitGame and not win:
-                board, win = moveAI(board, "x", "o");
-                if win or isBoardFull(board) or exitGame:
+                board, pointPlayer1 = moveAI(board, "x", "o", pointPlayer1);
+                if isBoardFull(board):
                     break;
-                board, win = moveAI(board, "o", "x");
+                board, pointPlayer2 = moveAI(board, "o", "x", pointPlayer2);
 
-            if win == False and not exitGame:
+            if pointPlayer1 > pointPlayer2:
+                print("Computer 1 Wins!");
+            elif pointPlayer1 < pointPlayer2:
+                print("Computer 2 Wins!");
+            elif pointPlayer1 == pointPlayer2:
                 print("Draw.");
 
         #reset value so player can choose new options
