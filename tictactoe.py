@@ -238,7 +238,9 @@ def movePlayer(board, exitGame, letter, point):
 
     return board, point, exitGame;
 
+#make 5 in a rows into some null value
 def changeLetter(board, letter):
+    newLetter = "z";
     storeMoves = [];
     for i in range(len(board)):
         for j in range(len(board[0])):
@@ -249,38 +251,38 @@ def changeLetter(board, letter):
         if [move[0]-1, move[1]-1] in storeMoves and [move[0]+1, move[1]+1] in storeMoves \
             and [move[0]-2, move[1]-2] in storeMoves and [move[0]+2, move[1]+2] in storeMoves:
             # left to right diagnal
-            board[move[0]-1][move[1]-1] = "z";
-            board[move[0]+1][move[1]+1] = "z";
-            board[move[0]-2][move[1]-2] = "z";
-            board[move[0]+2][move[1]+2] = "z";
-            board[move[0]][move[1]] = "z";
+            board[move[0]-1][move[1]-1] = newLetter;
+            board[move[0]+1][move[1]+1] = newLetter;
+            board[move[0]-2][move[1]-2] = newLetter;
+            board[move[0]+2][move[1]+2] = newLetter;
+            board[move[0]][move[1]] = newLetter;
             return board;
         elif [move[0]-1, move[1]] in storeMoves and [move[0]+1, move[1]] in storeMoves\
             and [move[0]-2, move[1]] in storeMoves and [move[0]+2, move[1]] in storeMoves:
             # up and down; vertical
-            board[move[0]-1][move[1]] = "z";
-            board[move[0]+1][move[1]] = "z";
-            board[move[0]-2][move[1]] = "z";
-            board[move[0]+2][move[1]] = "z";
-            board[move[0]][move[1]] = "z";
+            board[move[0]-1][move[1]] = newLetter;
+            board[move[0]+1][move[1]] = newLetter;
+            board[move[0]-2][move[1]] = newLetter;
+            board[move[0]+2][move[1]] = newLetter;
+            board[move[0]][move[1]] = newLetter;
             return board;
         elif [move[0], move[1]-1] in storeMoves and [move[0], move[1]+1] in storeMoves\
             and [move[0], move[1]-2] in storeMoves and [move[0], move[1]+2] in storeMoves:
             # left and right; horizontal
-            board[move[0]][move[1]-1] = "z";
-            board[move[0]][move[1]+1] = "z";
-            board[move[0]][move[1]-2] = "z";
-            board[move[0]][move[1]+2] = "z";
-            board[move[0]][move[1]] = "z";
+            board[move[0]][move[1]-1] = newLetter;
+            board[move[0]][move[1]+1] = newLetter;
+            board[move[0]][move[1]-2] = newLetter;
+            board[move[0]][move[1]+2] = newLetter;
+            board[move[0]][move[1]] = newLetter;
             return board;
         elif [move[0]-1, move[1]+1] in storeMoves and [move[0]+1, move[1]-1] in storeMoves\
             and [move[0]-2, move[1]+2] in storeMoves and [move[0]+2, move[1]-2] in storeMoves:
             # right to left diagnal 
-            board[move[0]-1][move[1]+1] = "z";
-            board[move[0]+1][move[1]-1] = "z";
-            board[move[0]-2][move[1]+2] = "z";
-            board[move[0]+2][move[1]-2] = "z";
-            board[move[0]][move[1]] = "z";
+            board[move[0]-1][move[1]+1] = newLetter;
+            board[move[0]+1][move[1]-1] = newLetter;
+            board[move[0]-2][move[1]+2] = newLetter;
+            board[move[0]+2][move[1]-2] = newLetter;
+            board[move[0]][move[1]] = newLetter;
             return board;
     return board;
 
@@ -318,7 +320,6 @@ def newGame():
 if __name__ == "__main__":
     print("\nWelcome to 5-In-A-Row.");
     exitProgram = False;
-    checkMain = True;
     while not exitProgram:
         print("\nWould you like to play:");
         print("\t1) Computer vs Player");
@@ -326,6 +327,8 @@ if __name__ == "__main__":
         print("\t3) Player vs Player");
         print("\t4) Computer vs Computer");
 
+        # check user input
+        checkMain = True;
         while checkMain:
             print("To exit program, type 'exit'.");
             play = input("Please enter a number: ");
@@ -359,7 +362,7 @@ if __name__ == "__main__":
             board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
 
             #while board is not empty or player chooses to end game
-            while not isBoardFull(board) and not exitGame and not win:
+            while not isBoardFull(board) and not exitGame:
                 board, pointPlayer1, exitGame = movePlayer(board, exitGame, "x", pointPlayer1);
                 if isBoardFull(board) or exitGame:
                     break;
@@ -375,7 +378,7 @@ if __name__ == "__main__":
         elif play == "3": #Player vs Player
             board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
             #while board is not empty or player chooses to end game
-            while not isBoardFull(board) and not exitGame and not win:
+            while not isBoardFull(board) and not exitGame:
                 board, pointPlayer1, exitGame = movePlayer(board, exitGame, "x", pointPlayer1);
                 if isBoardFull(board) or exitGame:
                     break;
@@ -391,7 +394,7 @@ if __name__ == "__main__":
         elif play == "4": # Computer vs Computer
             board, exitGame, win, MIN, MAX, pointPlayer1, pointPlayer2 = newGame();
             #while board is not empty or player chooses to end game
-            while not isBoardFull(board) and not exitGame and not win:
+            while not isBoardFull(board) and not exitGame:
                 board, pointPlayer1 = moveAI(board, "x", "o", pointPlayer1);
                 if isBoardFull(board):
                     break;
@@ -403,10 +406,3 @@ if __name__ == "__main__":
                 print("Computer 2 Wins!");
             elif pointPlayer1 == pointPlayer2:
                 print("Draw.");
-
-        #reset value so player can choose new options
-        checkMain = True;
-
-
-
-#issue: takes too long in a board greater than 3x3 and doesnt make best move
