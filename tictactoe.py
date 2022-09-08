@@ -299,7 +299,7 @@ def newGame():
         print("\nHow large would you like the board?");
         print("MAX size is 25x25, MIN size is 5x5.");
         move = input("Enter size of board" +
-        "' (RowxCoulmn e.g. 5x5 for 5x5 board): ");
+        " (RowxCoulmn e.g. 5x5 for 5x5 board): ");
 
         # if input is in numxnum format
         if re.search("^[0-9]*x[0-9]*$", move):
