@@ -274,6 +274,7 @@ if __name__ == "__main__":
         print("\t1) Computer vs Player");
         print("\t2) Player vs Computer");
         print("\t3) Player vs Player");
+        print("\t4) Computer vs Computer");
 
         while checkMain:
             print("To exit program, type 'exit'.");
@@ -282,7 +283,7 @@ if __name__ == "__main__":
             if re.search("[Ee]xit", play):
                 checkMain = False;
                 exitProgram = True;
-            elif re.search("^[123]$", play):
+            elif re.search("^[1234]$", play):
                 checkMain = False;
             else:
                 print("Invalid choice, please try again.\n");
@@ -318,6 +319,17 @@ if __name__ == "__main__":
                 if win or isBoardFull(board) or exitGame:
                     break;
                 board, win, exitGame = movePlayer(board, exitGame, "o");
+
+            if win == False and not exitGame:
+                print("Draw.");
+        elif play == "4":
+            board, exitGame, win, MIN, MAX = newGame();
+            #while board is not empty or player chooses to end game
+            while not isBoardFull(board) and not exitGame and not win:
+                board, win = moveAI(board, "x", "o");
+                if win or isBoardFull(board) or exitGame:
+                    break;
+                board, win = moveAI(board, "o", "x");
 
             if win == False and not exitGame:
                 print("Draw.");
